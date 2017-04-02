@@ -1,0 +1,720 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.5.0 #9253 (Jun 20 2015) (MINGW64)
+                                      4 ; This file was generated Wed May 18 14:23:26 2016
+                                      5 ;--------------------------------------------------------
+                                      6 	.module withtimer
+                                      7 	.optsdcc -mmcs51 --model-small
+                                      8 	
+                                      9 ;--------------------------------------------------------
+                                     10 ; Public variables in this module
+                                     11 ;--------------------------------------------------------
+                                     12 	.globl _Main
+                                     13 	.globl _CY
+                                     14 	.globl _AC
+                                     15 	.globl _F0
+                                     16 	.globl _RS1
+                                     17 	.globl _RS0
+                                     18 	.globl _OV
+                                     19 	.globl _F1
+                                     20 	.globl _P
+                                     21 	.globl _PS
+                                     22 	.globl _PT1
+                                     23 	.globl _PX1
+                                     24 	.globl _PT0
+                                     25 	.globl _PX0
+                                     26 	.globl _RD
+                                     27 	.globl _WR
+                                     28 	.globl _T1
+                                     29 	.globl _T0
+                                     30 	.globl _INT1
+                                     31 	.globl _INT0
+                                     32 	.globl _TXD
+                                     33 	.globl _RXD
+                                     34 	.globl _P3_7
+                                     35 	.globl _P3_6
+                                     36 	.globl _P3_5
+                                     37 	.globl _P3_4
+                                     38 	.globl _P3_3
+                                     39 	.globl _P3_2
+                                     40 	.globl _P3_1
+                                     41 	.globl _P3_0
+                                     42 	.globl _EA
+                                     43 	.globl _ES
+                                     44 	.globl _ET1
+                                     45 	.globl _EX1
+                                     46 	.globl _ET0
+                                     47 	.globl _EX0
+                                     48 	.globl _P2_7
+                                     49 	.globl _P2_6
+                                     50 	.globl _P2_5
+                                     51 	.globl _P2_4
+                                     52 	.globl _P2_3
+                                     53 	.globl _P2_2
+                                     54 	.globl _P2_1
+                                     55 	.globl _P2_0
+                                     56 	.globl _SM0
+                                     57 	.globl _SM1
+                                     58 	.globl _SM2
+                                     59 	.globl _REN
+                                     60 	.globl _TB8
+                                     61 	.globl _RB8
+                                     62 	.globl _TI
+                                     63 	.globl _RI
+                                     64 	.globl _P1_7
+                                     65 	.globl _P1_6
+                                     66 	.globl _P1_5
+                                     67 	.globl _P1_4
+                                     68 	.globl _P1_3
+                                     69 	.globl _P1_2
+                                     70 	.globl _P1_1
+                                     71 	.globl _P1_0
+                                     72 	.globl _TF1
+                                     73 	.globl _TR1
+                                     74 	.globl _TF0
+                                     75 	.globl _TR0
+                                     76 	.globl _IE1
+                                     77 	.globl _IT1
+                                     78 	.globl _IE0
+                                     79 	.globl _IT0
+                                     80 	.globl _P0_7
+                                     81 	.globl _P0_6
+                                     82 	.globl _P0_5
+                                     83 	.globl _P0_4
+                                     84 	.globl _P0_3
+                                     85 	.globl _P0_2
+                                     86 	.globl _P0_1
+                                     87 	.globl _P0_0
+                                     88 	.globl _B
+                                     89 	.globl _ACC
+                                     90 	.globl _PSW
+                                     91 	.globl _IP
+                                     92 	.globl _P3
+                                     93 	.globl _IE
+                                     94 	.globl _P2
+                                     95 	.globl _SBUF
+                                     96 	.globl _SCON
+                                     97 	.globl _P1
+                                     98 	.globl _TH1
+                                     99 	.globl _TH0
+                                    100 	.globl _TL1
+                                    101 	.globl _TL0
+                                    102 	.globl _TMOD
+                                    103 	.globl _TCON
+                                    104 	.globl _PCON
+                                    105 	.globl _DPH
+                                    106 	.globl _DPL
+                                    107 	.globl _SP
+                                    108 	.globl _P0
+                                    109 	.globl _cursorOrDisplayShift_PARM_2
+                                    110 	.globl _cursorOrDisplayShift_PARM_1
+                                    111 	.globl _displayOnOffControl_PARM_3
+                                    112 	.globl _displayOnOffControl_PARM_2
+                                    113 	.globl _displayOnOffControl_PARM_1
+                                    114 	.globl _returnHome
+                                    115 	.globl _entryModeSet
+                                    116 	.globl _displayOnOffControl
+                                    117 	.globl _cursorOrDisplayShift
+                                    118 	.globl _functionSet
+                                    119 	.globl _clearDisplay
+                                    120 	.globl _setDdRamAddress
+                                    121 	.globl _sendChar
+                                    122 	.globl _sendString
+                                    123 	.globl _delay
+                                    124 	.globl _big_delay
+                                    125 	.globl _timer_delay
+                                    126 ;--------------------------------------------------------
+                                    127 ; special function registers
+                                    128 ;--------------------------------------------------------
+                                    129 	.area RSEG    (ABS,DATA)
+      000000                        130 	.org 0x0000
+                           000080   131 _P0	=	0x0080
+                           000081   132 _SP	=	0x0081
+                           000082   133 _DPL	=	0x0082
+                           000083   134 _DPH	=	0x0083
+                           000087   135 _PCON	=	0x0087
+                           000088   136 _TCON	=	0x0088
+                           000089   137 _TMOD	=	0x0089
+                           00008A   138 _TL0	=	0x008a
+                           00008B   139 _TL1	=	0x008b
+                           00008C   140 _TH0	=	0x008c
+                           00008D   141 _TH1	=	0x008d
+                           000090   142 _P1	=	0x0090
+                           000098   143 _SCON	=	0x0098
+                           000099   144 _SBUF	=	0x0099
+                           0000A0   145 _P2	=	0x00a0
+                           0000A8   146 _IE	=	0x00a8
+                           0000B0   147 _P3	=	0x00b0
+                           0000B8   148 _IP	=	0x00b8
+                           0000D0   149 _PSW	=	0x00d0
+                           0000E0   150 _ACC	=	0x00e0
+                           0000F0   151 _B	=	0x00f0
+                                    152 ;--------------------------------------------------------
+                                    153 ; special function bits
+                                    154 ;--------------------------------------------------------
+                                    155 	.area RSEG    (ABS,DATA)
+      000000                        156 	.org 0x0000
+                           000080   157 _P0_0	=	0x0080
+                           000081   158 _P0_1	=	0x0081
+                           000082   159 _P0_2	=	0x0082
+                           000083   160 _P0_3	=	0x0083
+                           000084   161 _P0_4	=	0x0084
+                           000085   162 _P0_5	=	0x0085
+                           000086   163 _P0_6	=	0x0086
+                           000087   164 _P0_7	=	0x0087
+                           000088   165 _IT0	=	0x0088
+                           000089   166 _IE0	=	0x0089
+                           00008A   167 _IT1	=	0x008a
+                           00008B   168 _IE1	=	0x008b
+                           00008C   169 _TR0	=	0x008c
+                           00008D   170 _TF0	=	0x008d
+                           00008E   171 _TR1	=	0x008e
+                           00008F   172 _TF1	=	0x008f
+                           000090   173 _P1_0	=	0x0090
+                           000091   174 _P1_1	=	0x0091
+                           000092   175 _P1_2	=	0x0092
+                           000093   176 _P1_3	=	0x0093
+                           000094   177 _P1_4	=	0x0094
+                           000095   178 _P1_5	=	0x0095
+                           000096   179 _P1_6	=	0x0096
+                           000097   180 _P1_7	=	0x0097
+                           000098   181 _RI	=	0x0098
+                           000099   182 _TI	=	0x0099
+                           00009A   183 _RB8	=	0x009a
+                           00009B   184 _TB8	=	0x009b
+                           00009C   185 _REN	=	0x009c
+                           00009D   186 _SM2	=	0x009d
+                           00009E   187 _SM1	=	0x009e
+                           00009F   188 _SM0	=	0x009f
+                           0000A0   189 _P2_0	=	0x00a0
+                           0000A1   190 _P2_1	=	0x00a1
+                           0000A2   191 _P2_2	=	0x00a2
+                           0000A3   192 _P2_3	=	0x00a3
+                           0000A4   193 _P2_4	=	0x00a4
+                           0000A5   194 _P2_5	=	0x00a5
+                           0000A6   195 _P2_6	=	0x00a6
+                           0000A7   196 _P2_7	=	0x00a7
+                           0000A8   197 _EX0	=	0x00a8
+                           0000A9   198 _ET0	=	0x00a9
+                           0000AA   199 _EX1	=	0x00aa
+                           0000AB   200 _ET1	=	0x00ab
+                           0000AC   201 _ES	=	0x00ac
+                           0000AF   202 _EA	=	0x00af
+                           0000B0   203 _P3_0	=	0x00b0
+                           0000B1   204 _P3_1	=	0x00b1
+                           0000B2   205 _P3_2	=	0x00b2
+                           0000B3   206 _P3_3	=	0x00b3
+                           0000B4   207 _P3_4	=	0x00b4
+                           0000B5   208 _P3_5	=	0x00b5
+                           0000B6   209 _P3_6	=	0x00b6
+                           0000B7   210 _P3_7	=	0x00b7
+                           0000B0   211 _RXD	=	0x00b0
+                           0000B1   212 _TXD	=	0x00b1
+                           0000B2   213 _INT0	=	0x00b2
+                           0000B3   214 _INT1	=	0x00b3
+                           0000B4   215 _T0	=	0x00b4
+                           0000B5   216 _T1	=	0x00b5
+                           0000B6   217 _WR	=	0x00b6
+                           0000B7   218 _RD	=	0x00b7
+                           0000B8   219 _PX0	=	0x00b8
+                           0000B9   220 _PT0	=	0x00b9
+                           0000BA   221 _PX1	=	0x00ba
+                           0000BB   222 _PT1	=	0x00bb
+                           0000BC   223 _PS	=	0x00bc
+                           0000D0   224 _P	=	0x00d0
+                           0000D1   225 _F1	=	0x00d1
+                           0000D2   226 _OV	=	0x00d2
+                           0000D3   227 _RS0	=	0x00d3
+                           0000D4   228 _RS1	=	0x00d4
+                           0000D5   229 _F0	=	0x00d5
+                           0000D6   230 _AC	=	0x00d6
+                           0000D7   231 _CY	=	0x00d7
+                                    232 ;--------------------------------------------------------
+                                    233 ; overlayable register banks
+                                    234 ;--------------------------------------------------------
+                                    235 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        236 	.ds 8
+                                    237 ;--------------------------------------------------------
+                                    238 ; internal ram data
+                                    239 ;--------------------------------------------------------
+                                    240 	.area DSEG    (DATA)
+      000030                        241 _Main_Seconds_1_28:
+      000030                        242 	.ds 2
+      000032                        243 _Main_Minutes_1_28:
+      000032                        244 	.ds 2
+      000034                        245 _Main_Hours_1_28:
+      000034                        246 	.ds 2
+      000036                        247 _Main_Day_1_28:
+      000036                        248 	.ds 2
+      000038                        249 _Main_Month_1_28:
+      000038                        250 	.ds 2
+      00003A                        251 _Main_Year_1_28:
+      00003A                        252 	.ds 2
+                                    253 ;--------------------------------------------------------
+                                    254 ; overlayable items in internal ram 
+                                    255 ;--------------------------------------------------------
+                                    256 	.area	OSEG    (OVR,DATA)
+                                    257 	.area	OSEG    (OVR,DATA)
+                                    258 	.area	OSEG    (OVR,DATA)
+                                    259 ;--------------------------------------------------------
+                                    260 ; indirectly addressable internal ram data
+                                    261 ;--------------------------------------------------------
+                                    262 	.area ISEG    (DATA)
+                                    263 ;--------------------------------------------------------
+                                    264 ; absolute internal ram data
+                                    265 ;--------------------------------------------------------
+                                    266 	.area IABS    (ABS,DATA)
+                                    267 	.area IABS    (ABS,DATA)
+                                    268 ;--------------------------------------------------------
+                                    269 ; bit data
+                                    270 ;--------------------------------------------------------
+                                    271 	.area BSEG    (BIT)
+      000000                        272 _displayOnOffControl_PARM_1:
+      000000                        273 	.ds 1
+      000001                        274 _displayOnOffControl_PARM_2:
+      000001                        275 	.ds 1
+      000002                        276 _displayOnOffControl_PARM_3:
+      000002                        277 	.ds 1
+      000003                        278 _cursorOrDisplayShift_PARM_1:
+      000003                        279 	.ds 1
+      000004                        280 _cursorOrDisplayShift_PARM_2:
+      000004                        281 	.ds 1
+                                    282 ;--------------------------------------------------------
+                                    283 ; paged external ram data
+                                    284 ;--------------------------------------------------------
+                                    285 	.area PSEG    (PAG,XDATA)
+                                    286 ;--------------------------------------------------------
+                                    287 ; external ram data
+                                    288 ;--------------------------------------------------------
+                                    289 	.area XSEG    (XDATA)
+                                    290 ;--------------------------------------------------------
+                                    291 ; absolute external ram data
+                                    292 ;--------------------------------------------------------
+                                    293 	.area XABS    (ABS,XDATA)
+                                    294 ;--------------------------------------------------------
+                                    295 ; external initialized ram data
+                                    296 ;--------------------------------------------------------
+                                    297 	.area XISEG   (XDATA)
+                                    298 	.area HOME    (CODE)
+                                    299 	.area GSINIT0 (CODE)
+                                    300 	.area GSINIT1 (CODE)
+                                    301 	.area GSINIT2 (CODE)
+                                    302 	.area GSINIT3 (CODE)
+                                    303 	.area GSINIT4 (CODE)
+                                    304 	.area GSINIT5 (CODE)
+                                    305 	.area GSINIT  (CODE)
+                                    306 	.area GSFINAL (CODE)
+                                    307 	.area CSEG    (CODE)
+                                    308 ;--------------------------------------------------------
+                                    309 ; global & static initialisations
+                                    310 ;--------------------------------------------------------
+                                    311 	.area HOME    (CODE)
+                                    312 	.area GSINIT  (CODE)
+                                    313 	.area GSFINAL (CODE)
+                                    314 	.area GSINIT  (CODE)
+                                    315 ;--------------------------------------------------------
+                                    316 ; Home
+                                    317 ;--------------------------------------------------------
+                                    318 	.area HOME    (CODE)
+                                    319 	.area HOME    (CODE)
+                                    320 ;--------------------------------------------------------
+                                    321 ; code
+                                    322 ;--------------------------------------------------------
+                                    323 	.area CSEG    (CODE)
+                                    324 ;------------------------------------------------------------
+                                    325 ;Allocation info for local variables in function 'Main'
+                                    326 ;------------------------------------------------------------
+                                    327 ;iterator                  Allocated to registers 
+                                    328 ;plus                      Allocated to registers 
+                                    329 ;Seconds                   Allocated with name '_Main_Seconds_1_28'
+                                    330 ;Minutes                   Allocated with name '_Main_Minutes_1_28'
+                                    331 ;Hours                     Allocated with name '_Main_Hours_1_28'
+                                    332 ;Day                       Allocated with name '_Main_Day_1_28'
+                                    333 ;Month                     Allocated with name '_Main_Month_1_28'
+                                    334 ;Year                      Allocated with name '_Main_Year_1_28'
+                                    335 ;gotkey                    Allocated to registers 
+                                    336 ;cc                        Allocated to registers 
+                                    337 ;count                     Allocated to registers r7 
+                                    338 ;------------------------------------------------------------
+                                    339 ;	withtimer.c:47: void Main (void) __naked {
+                                    340 ;	-----------------------------------------
+                                    341 ;	 function Main
+                                    342 ;	-----------------------------------------
+      000000                        343 _Main:
+                                    344 ;	naked function: no prologue.
+                                    345 ;	withtimer.c:52: unsigned char Seconds[] ={0,0};
+      000000 75 30 00         [24]  346 	mov	_Main_Seconds_1_28,#0x00
+      000003 75 31 00         [24]  347 	mov	(_Main_Seconds_1_28 + 0x0001),#0x00
+                                    348 ;	withtimer.c:53: unsigned char Minutes[] ={0,0};
+      000006 75 32 00         [24]  349 	mov	_Main_Minutes_1_28,#0x00
+      000009 75 33 00         [24]  350 	mov	(_Main_Minutes_1_28 + 0x0001),#0x00
+                                    351 ;	withtimer.c:54: unsigned char Hours[] = {0,0};
+      00000C 75 34 00         [24]  352 	mov	_Main_Hours_1_28,#0x00
+      00000F 75 35 00         [24]  353 	mov	(_Main_Hours_1_28 + 0x0001),#0x00
+                                    354 ;	withtimer.c:55: unsigned char Day[] ={0,0};
+      000012 75 36 00         [24]  355 	mov	_Main_Day_1_28,#0x00
+      000015 75 37 00         [24]  356 	mov	(_Main_Day_1_28 + 0x0001),#0x00
+                                    357 ;	withtimer.c:56: unsigned char Month[] ={0,0};
+      000018 75 38 00         [24]  358 	mov	_Main_Month_1_28,#0x00
+      00001B 75 39 00         [24]  359 	mov	(_Main_Month_1_28 + 0x0001),#0x00
+                                    360 ;	withtimer.c:57: unsigned char Year[] = {0,0};
+      00001E 75 3A 00         [24]  361 	mov	_Main_Year_1_28,#0x00
+      000021 75 3B 00         [24]  362 	mov	(_Main_Year_1_28 + 0x0001),#0x00
+                                    363 ;	withtimer.c:67: char count = 0;
+      000024 7F 00            [12]  364 	mov	r7,#0x00
+                                    365 ;	withtimer.c:74: functionSet();
+      000026 C0 07            [24]  366 	push	ar7
+      000028 12 00 BC         [24]  367 	lcall	_functionSet
+                                    368 ;	withtimer.c:75: entryModeSet(); // increment and no shift
+      00002B 12 00 76         [24]  369 	lcall	_entryModeSet
+      00002E D0 07            [24]  370 	pop	ar7
+                                    371 ;	withtimer.c:76: displayOnOffControl(1, 1, 1); // display on, cursor on and blinking on
+      000030 D2 00            [12]  372 	setb	_displayOnOffControl_PARM_1
+      000032 D2 01            [12]  373 	setb	_displayOnOffControl_PARM_2
+      000034 D2 02            [12]  374 	setb	_displayOnOffControl_PARM_3
+      000036 C0 07            [24]  375 	push	ar7
+      000038 12 00 82         [24]  376 	lcall	_displayOnOffControl
+                                    377 ;	withtimer.c:77: sendString("00:00:00");
+      00003B 90 01 68         [24]  378 	mov	dptr,#___str_0
+      00003E 75 F0 80         [24]  379 	mov	b,#0x80
+      000041 12 00 F1         [24]  380 	lcall	_sendString
+                                    381 ;	withtimer.c:78: setDdRamAddress(0x40);	// set address to start of second line
+      000044 75 82 40         [24]  382 	mov	dpl,#0x40
+      000047 12 00 D4         [24]  383 	lcall	_setDdRamAddress
+                                    384 ;	withtimer.c:79: sendString("01-01-00");
+      00004A 90 01 71         [24]  385 	mov	dptr,#___str_1
+      00004D 75 F0 80         [24]  386 	mov	b,#0x80
+      000050 12 00 F1         [24]  387 	lcall	_sendString
+      000053 D0 07            [24]  388 	pop	ar7
+                                    389 ;	withtimer.c:80: while (1){
+      000055                        390 00102$:
+                                    391 ;	withtimer.c:82: P1 = ~ count;
+      000055 EF               [12]  392 	mov	a,r7
+      000056 F4               [12]  393 	cpl	a
+      000057 F5 90            [12]  394 	mov	_P1,a
+                                    395 ;	withtimer.c:83: timer_delay();
+      000059 12 01 31         [24]  396 	lcall	_timer_delay
+                                    397 ;	withtimer.c:85: count = (char)cc;
+      00005C 7F 34            [12]  398 	mov	r7,#0x34
+                                    399 ;	withtimer.c:86: sendChar(cc);
+      00005E 75 82 34         [24]  400 	mov	dpl,#0x34
+      000061 C0 07            [24]  401 	push	ar7
+      000063 12 00 E4         [24]  402 	lcall	_sendChar
+      000066 D0 07            [24]  403 	pop	ar7
+      000068 80 EB            [24]  404 	sjmp	00102$
+                                    405 ;	naked function: no epilogue.
+                                    406 ;------------------------------------------------------------
+                                    407 ;Allocation info for local variables in function 'returnHome'
+                                    408 ;------------------------------------------------------------
+                                    409 ;	withtimer.c:175: void returnHome(void) {
+                                    410 ;	-----------------------------------------
+                                    411 ;	 function returnHome
+                                    412 ;	-----------------------------------------
+      00006A                        413 _returnHome:
+                           000007   414 	ar7 = 0x07
+                           000006   415 	ar6 = 0x06
+                           000005   416 	ar5 = 0x05
+                           000004   417 	ar4 = 0x04
+                           000003   418 	ar3 = 0x03
+                           000002   419 	ar2 = 0x02
+                           000001   420 	ar1 = 0x01
+                           000000   421 	ar0 = 0x00
+                                    422 ;	withtimer.c:176: RS = 0;
+      00006A C2 A3            [12]  423 	clr	_P2_3
+                                    424 ;	withtimer.c:177: P1 = 0x02; // LCD command to return home (the first location of the first lcd line)
+      00006C 75 90 02         [24]  425 	mov	_P1,#0x02
+                                    426 ;	withtimer.c:178: E = 1;
+      00006F D2 A2            [12]  427 	setb	_P2_2
+                                    428 ;	withtimer.c:179: E = 0;
+      000071 C2 A2            [12]  429 	clr	_P2_2
+                                    430 ;	withtimer.c:180: big_delay(); // This operation needs a bigger delay
+      000073 02 01 27         [24]  431 	ljmp	_big_delay
+                                    432 ;------------------------------------------------------------
+                                    433 ;Allocation info for local variables in function 'entryModeSet'
+                                    434 ;------------------------------------------------------------
+                                    435 ;	withtimer.c:183: void entryModeSet() {
+                                    436 ;	-----------------------------------------
+                                    437 ;	 function entryModeSet
+                                    438 ;	-----------------------------------------
+      000076                        439 _entryModeSet:
+                                    440 ;	withtimer.c:184: RS = 0;
+      000076 C2 A3            [12]  441 	clr	_P2_3
+                                    442 ;	withtimer.c:185: P1 = 0x06;  
+      000078 75 90 06         [24]  443 	mov	_P1,#0x06
+                                    444 ;	withtimer.c:186: E = 1;
+      00007B D2 A2            [12]  445 	setb	_P2_2
+                                    446 ;	withtimer.c:187: E = 0;
+      00007D C2 A2            [12]  447 	clr	_P2_2
+                                    448 ;	withtimer.c:188: delay();
+      00007F 02 01 1E         [24]  449 	ljmp	_delay
+                                    450 ;------------------------------------------------------------
+                                    451 ;Allocation info for local variables in function 'displayOnOffControl'
+                                    452 ;------------------------------------------------------------
+                                    453 ;	withtimer.c:191: void displayOnOffControl(__bit display, __bit cursor, __bit blinking) {
+                                    454 ;	-----------------------------------------
+                                    455 ;	 function displayOnOffControl
+                                    456 ;	-----------------------------------------
+      000082                        457 _displayOnOffControl:
+                                    458 ;	withtimer.c:192: P1_7 = 0;
+      000082 C2 97            [12]  459 	clr	_P1_7
+                                    460 ;	withtimer.c:193: P1_6 = 0;
+      000084 C2 96            [12]  461 	clr	_P1_6
+                                    462 ;	withtimer.c:194: P1_5 = 0;
+      000086 C2 95            [12]  463 	clr	_P1_5
+                                    464 ;	withtimer.c:195: P1_4 = 0;
+      000088 C2 94            [12]  465 	clr	_P1_4
+                                    466 ;	withtimer.c:196: P1_3 = 1;
+      00008A D2 93            [12]  467 	setb	_P1_3
+                                    468 ;	withtimer.c:197: P1_2 = display;
+      00008C A2 00            [12]  469 	mov	c,_displayOnOffControl_PARM_1
+      00008E 92 92            [24]  470 	mov	_P1_2,c
+                                    471 ;	withtimer.c:198: P1_1 = cursor;
+      000090 A2 01            [12]  472 	mov	c,_displayOnOffControl_PARM_2
+      000092 92 91            [24]  473 	mov	_P1_1,c
+                                    474 ;	withtimer.c:199: P1_0 = blinking;
+      000094 A2 02            [12]  475 	mov	c,_displayOnOffControl_PARM_3
+      000096 92 90            [24]  476 	mov	_P1_0,c
+                                    477 ;	withtimer.c:200: E = 1;
+      000098 D2 A2            [12]  478 	setb	_P2_2
+                                    479 ;	withtimer.c:201: E = 0;
+      00009A C2 A2            [12]  480 	clr	_P2_2
+                                    481 ;	withtimer.c:202: delay();
+      00009C 02 01 1E         [24]  482 	ljmp	_delay
+                                    483 ;------------------------------------------------------------
+                                    484 ;Allocation info for local variables in function 'cursorOrDisplayShift'
+                                    485 ;------------------------------------------------------------
+                                    486 ;	withtimer.c:205: void cursorOrDisplayShift(__bit sc, __bit rl) {
+                                    487 ;	-----------------------------------------
+                                    488 ;	 function cursorOrDisplayShift
+                                    489 ;	-----------------------------------------
+      00009F                        490 _cursorOrDisplayShift:
+                                    491 ;	withtimer.c:206: RS = 0;
+      00009F C2 A3            [12]  492 	clr	_P2_3
+                                    493 ;	withtimer.c:207: P1_7 = 0;
+      0000A1 C2 97            [12]  494 	clr	_P1_7
+                                    495 ;	withtimer.c:208: P1_6 = 0;
+      0000A3 C2 96            [12]  496 	clr	_P1_6
+                                    497 ;	withtimer.c:209: P1_5 = 0;
+      0000A5 C2 95            [12]  498 	clr	_P1_5
+                                    499 ;	withtimer.c:210: P1_4 = 1;
+      0000A7 D2 94            [12]  500 	setb	_P1_4
+                                    501 ;	withtimer.c:211: P1_3 = sc;
+      0000A9 A2 03            [12]  502 	mov	c,_cursorOrDisplayShift_PARM_1
+      0000AB 92 93            [24]  503 	mov	_P1_3,c
+                                    504 ;	withtimer.c:212: P1_2 = rl;
+      0000AD A2 04            [12]  505 	mov	c,_cursorOrDisplayShift_PARM_2
+      0000AF 92 92            [24]  506 	mov	_P1_2,c
+                                    507 ;	withtimer.c:213: P1_1 = 0;
+      0000B1 C2 91            [12]  508 	clr	_P1_1
+                                    509 ;	withtimer.c:214: P1_0 = 0;
+      0000B3 C2 90            [12]  510 	clr	_P1_0
+                                    511 ;	withtimer.c:215: E = 1;
+      0000B5 D2 A2            [12]  512 	setb	_P2_2
+                                    513 ;	withtimer.c:216: E = 0;
+      0000B7 C2 A2            [12]  514 	clr	_P2_2
+                                    515 ;	withtimer.c:217: delay();
+      0000B9 02 01 1E         [24]  516 	ljmp	_delay
+                                    517 ;------------------------------------------------------------
+                                    518 ;Allocation info for local variables in function 'functionSet'
+                                    519 ;------------------------------------------------------------
+                                    520 ;	withtimer.c:220: void functionSet(void) {
+                                    521 ;	-----------------------------------------
+                                    522 ;	 function functionSet
+                                    523 ;	-----------------------------------------
+      0000BC                        524 _functionSet:
+                                    525 ;	withtimer.c:221: RS = 0;
+      0000BC C2 A3            [12]  526 	clr	_P2_3
+                                    527 ;	withtimer.c:222: P1 = 0x38; // 8-bit mode, 2 lines LCD
+      0000BE 75 90 38         [24]  528 	mov	_P1,#0x38
+                                    529 ;	withtimer.c:223: E = 1;
+      0000C1 D2 A2            [12]  530 	setb	_P2_2
+                                    531 ;	withtimer.c:224: E = 0;
+      0000C3 C2 A2            [12]  532 	clr	_P2_2
+                                    533 ;	withtimer.c:225: delay();
+      0000C5 02 01 1E         [24]  534 	ljmp	_delay
+                                    535 ;------------------------------------------------------------
+                                    536 ;Allocation info for local variables in function 'clearDisplay'
+                                    537 ;------------------------------------------------------------
+                                    538 ;	withtimer.c:228: void clearDisplay(void) {
+                                    539 ;	-----------------------------------------
+                                    540 ;	 function clearDisplay
+                                    541 ;	-----------------------------------------
+      0000C8                        542 _clearDisplay:
+                                    543 ;	withtimer.c:229: RS = 0;
+      0000C8 C2 A3            [12]  544 	clr	_P2_3
+                                    545 ;	withtimer.c:230: P1 = 0x01; // command to clear LCD and return the cursor to the home position
+      0000CA 75 90 01         [24]  546 	mov	_P1,#0x01
+                                    547 ;	withtimer.c:231: E = 1;
+      0000CD D2 A2            [12]  548 	setb	_P2_2
+                                    549 ;	withtimer.c:232: E = 0;
+      0000CF C2 A2            [12]  550 	clr	_P2_2
+                                    551 ;	withtimer.c:233: big_delay(); // This operation needs a bigger delay
+      0000D1 02 01 27         [24]  552 	ljmp	_big_delay
+                                    553 ;------------------------------------------------------------
+                                    554 ;Allocation info for local variables in function 'setDdRamAddress'
+                                    555 ;------------------------------------------------------------
+                                    556 ;address                   Allocated to registers r7 
+                                    557 ;------------------------------------------------------------
+                                    558 ;	withtimer.c:236: void setDdRamAddress(char address) {  // Determine the place to place the next character - First LCD location address in 00h for line 1 and 40h for line 2
+                                    559 ;	-----------------------------------------
+                                    560 ;	 function setDdRamAddress
+                                    561 ;	-----------------------------------------
+      0000D4                        562 _setDdRamAddress:
+      0000D4 AF 82            [24]  563 	mov	r7,dpl
+                                    564 ;	withtimer.c:237: RS = 0;
+      0000D6 C2 A3            [12]  565 	clr	_P2_3
+                                    566 ;	withtimer.c:238: P1 = address | 0x80;  // set the MSB to detect that this is an address
+      0000D8 74 80            [12]  567 	mov	a,#0x80
+      0000DA 4F               [12]  568 	orl	a,r7
+      0000DB F5 90            [12]  569 	mov	_P1,a
+                                    570 ;	withtimer.c:239: E = 1;
+      0000DD D2 A2            [12]  571 	setb	_P2_2
+                                    572 ;	withtimer.c:240: E = 0;
+      0000DF C2 A2            [12]  573 	clr	_P2_2
+                                    574 ;	withtimer.c:241: delay();
+      0000E1 02 01 1E         [24]  575 	ljmp	_delay
+                                    576 ;------------------------------------------------------------
+                                    577 ;Allocation info for local variables in function 'sendChar'
+                                    578 ;------------------------------------------------------------
+                                    579 ;c                         Allocated to registers r7 
+                                    580 ;------------------------------------------------------------
+                                    581 ;	withtimer.c:246: void sendChar(char c) {  // Function to send one character to be displayed on the LCD
+                                    582 ;	-----------------------------------------
+                                    583 ;	 function sendChar
+                                    584 ;	-----------------------------------------
+      0000E4                        585 _sendChar:
+      0000E4 AF 82            [24]  586 	mov	r7,dpl
+                                    587 ;	withtimer.c:247: RS = 1;
+      0000E6 D2 A3            [12]  588 	setb	_P2_3
+                                    589 ;	withtimer.c:248: P1 = c;
+      0000E8 8F 90            [24]  590 	mov	_P1,r7
+                                    591 ;	withtimer.c:249: E = 1;
+      0000EA D2 A2            [12]  592 	setb	_P2_2
+                                    593 ;	withtimer.c:250: E = 0;
+      0000EC C2 A2            [12]  594 	clr	_P2_2
+                                    595 ;	withtimer.c:251: delay();
+      0000EE 02 01 1E         [24]  596 	ljmp	_delay
+                                    597 ;------------------------------------------------------------
+                                    598 ;Allocation info for local variables in function 'sendString'
+                                    599 ;------------------------------------------------------------
+                                    600 ;str                       Allocated to registers 
+                                    601 ;c                         Allocated to registers r3 
+                                    602 ;------------------------------------------------------------
+                                    603 ;	withtimer.c:254: void sendString(char* str) {  // Function to send a string of characters to be displayed on the lCD
+                                    604 ;	-----------------------------------------
+                                    605 ;	 function sendString
+                                    606 ;	-----------------------------------------
+      0000F1                        607 _sendString:
+      0000F1 AD 82            [24]  608 	mov	r5,dpl
+      0000F3 AE 83            [24]  609 	mov	r6,dph
+      0000F5 AF F0            [24]  610 	mov	r7,b
+                                    611 ;	withtimer.c:256: while (c = *str++) {
+      0000F7                        612 00101$:
+      0000F7 8D 82            [24]  613 	mov	dpl,r5
+      0000F9 8E 83            [24]  614 	mov	dph,r6
+      0000FB 8F F0            [24]  615 	mov	b,r7
+      0000FD 12 01 4C         [24]  616 	lcall	__gptrget
+      000100 FC               [12]  617 	mov	r4,a
+      000101 A3               [24]  618 	inc	dptr
+      000102 AD 82            [24]  619 	mov	r5,dpl
+      000104 AE 83            [24]  620 	mov	r6,dph
+      000106 EC               [12]  621 	mov	a,r4
+      000107 FB               [12]  622 	mov	r3,a
+      000108 60 13            [24]  623 	jz	00104$
+                                    624 ;	withtimer.c:257: sendChar(c);
+      00010A 8B 82            [24]  625 	mov	dpl,r3
+      00010C C0 07            [24]  626 	push	ar7
+      00010E C0 06            [24]  627 	push	ar6
+      000110 C0 05            [24]  628 	push	ar5
+      000112 12 00 E4         [24]  629 	lcall	_sendChar
+      000115 D0 05            [24]  630 	pop	ar5
+      000117 D0 06            [24]  631 	pop	ar6
+      000119 D0 07            [24]  632 	pop	ar7
+      00011B 80 DA            [24]  633 	sjmp	00101$
+      00011D                        634 00104$:
+      00011D 22               [24]  635 	ret
+                                    636 ;------------------------------------------------------------
+                                    637 ;Allocation info for local variables in function 'delay'
+                                    638 ;------------------------------------------------------------
+                                    639 ;c                         Allocated to registers r7 
+                                    640 ;------------------------------------------------------------
+                                    641 ;	withtimer.c:261: void delay(void) {
+                                    642 ;	-----------------------------------------
+                                    643 ;	 function delay
+                                    644 ;	-----------------------------------------
+      00011E                        645 _delay:
+                                    646 ;	withtimer.c:263: for (c = 0; c < 50; c++);
+      00011E 7F 32            [12]  647 	mov	r7,#0x32
+      000120                        648 00104$:
+      000120 EF               [12]  649 	mov	a,r7
+      000121 14               [12]  650 	dec	a
+      000122 FE               [12]  651 	mov	r6,a
+      000123 FF               [12]  652 	mov	r7,a
+      000124 70 FA            [24]  653 	jnz	00104$
+      000126 22               [24]  654 	ret
+                                    655 ;------------------------------------------------------------
+                                    656 ;Allocation info for local variables in function 'big_delay'
+                                    657 ;------------------------------------------------------------
+                                    658 ;c                         Allocated to registers r7 
+                                    659 ;------------------------------------------------------------
+                                    660 ;	withtimer.c:266: void big_delay(void) {
+                                    661 ;	-----------------------------------------
+                                    662 ;	 function big_delay
+                                    663 ;	-----------------------------------------
+      000127                        664 _big_delay:
+                                    665 ;	withtimer.c:268: for (c = 0; c < 255; c++);
+      000127 7F FF            [12]  666 	mov	r7,#0xFF
+      000129                        667 00104$:
+      000129 8F 06            [24]  668 	mov	ar6,r7
+      00012B 1E               [12]  669 	dec	r6
+      00012C EE               [12]  670 	mov	a,r6
+      00012D FF               [12]  671 	mov	r7,a
+      00012E 70 F9            [24]  672 	jnz	00104$
+      000130 22               [24]  673 	ret
+                                    674 ;------------------------------------------------------------
+                                    675 ;Allocation info for local variables in function 'timer_delay'
+                                    676 ;------------------------------------------------------------
+                                    677 ;a                         Allocated to registers r7 
+                                    678 ;------------------------------------------------------------
+                                    679 ;	withtimer.c:271: void timer_delay(void){
+                                    680 ;	-----------------------------------------
+                                    681 ;	 function timer_delay
+                                    682 ;	-----------------------------------------
+      000131                        683 _timer_delay:
+                                    684 ;	withtimer.c:274: TMOD = 0x01;
+      000131 75 89 01         [24]  685 	mov	_TMOD,#0x01
+                                    686 ;	withtimer.c:275: while (a != 0){
+      000134 7F 14            [12]  687 	mov	r7,#0x14
+      000136                        688 00104$:
+      000136 EF               [12]  689 	mov	a,r7
+      000137 60 12            [24]  690 	jz	00107$
+                                    691 ;	withtimer.c:276: TL0 = 0xAF;
+      000139 75 8A AF         [24]  692 	mov	_TL0,#0xAF
+                                    693 ;	withtimer.c:277: TH0 = 0x3C;
+      00013C 75 8C 3C         [24]  694 	mov	_TH0,#0x3C
+                                    695 ;	withtimer.c:278: TR0 = 1;
+      00013F D2 8C            [12]  696 	setb	_TR0
+                                    697 ;	withtimer.c:279: while (!TF0) ;
+      000141                        698 00101$:
+      000141 30 8D FD         [24]  699 	jnb	_TF0,00101$
+                                    700 ;	withtimer.c:280: TR0 = 0;
+      000144 C2 8C            [12]  701 	clr	_TR0
+                                    702 ;	withtimer.c:281: TF0 = 0;
+      000146 C2 8D            [12]  703 	clr	_TF0
+                                    704 ;	withtimer.c:282: a = a-1;
+      000148 1F               [12]  705 	dec	r7
+      000149 80 EB            [24]  706 	sjmp	00104$
+      00014B                        707 00107$:
+      00014B 22               [24]  708 	ret
+                                    709 	.area CSEG    (CODE)
+                                    710 	.area CONST   (CODE)
+      000168                        711 ___str_0:
+      000168 30 30 3A 30 30 3A 30   712 	.ascii "00:00:00"
+             30
+      000170 00                     713 	.db 0x00
+      000171                        714 ___str_1:
+      000171 30 31 2D 30 31 2D 30   715 	.ascii "01-01-00"
+             30
+      000179 00                     716 	.db 0x00
+                                    717 	.area XINIT   (CODE)
+                                    718 	.area CABS    (ABS,CODE)

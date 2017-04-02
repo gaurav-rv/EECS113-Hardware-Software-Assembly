@@ -1,0 +1,478 @@
+/*
+| Assignment 5: Digital Clock
+| 
+| This program displays the clock time (HH:MM:SS) and date (DD-MM-YY)
+| 
+| To work assign SW0 to P3.2, SW1 to P3.3, E to P3.6, and RS to P3.7
+| 
+| To compile: 
+| % sdcc --model-small -mmcs51 --Werror -I. -c assignment5.c
+| % sdcc --model-small -mmcs51 --Werror -I. --iram-size 0x100 --code-size 0x1000 --code-loc 0x0000 --stack-loc 0x30 --data-loc 0x30 --out-fmt-ihx assignment5.rel
+| % packihx assignment5.ihx > assignment5.hex
+| 
+*/
+
+#include <8051.h>
+#include <stdlib.h>
+
+#define DB P1
+#define SW0 P3_2
+#define SW1 P3_3
+#define E P2_2
+#define RS P2_3
+
+// Global variables used for Time
+int hour = 0;
+int minute = 0;
+int second = 0;
+
+// Global variables used for Date
+int month = 1;
+int day = 1;
+int year = 0;
+
+int position;
+
+char getChar(void);
+void displayToScreen(int h, int m, int s, int f);
+void setTime(void);
+void setDate(void);
+
+void returnHome(void);
+void entryModeSet();
+void displayOnOffControl(__bit display, __bit cursor, __bit blinking);
+void cursorOrDisplayShift(__bit sc, __bit rl);
+void functionSet(void);
+void clearDisplay(void);
+void setDdRamAddress(char address);
+
+void sendChar(char c);
+void sendString(char* str);
+void delay(void);
+void big_delay(void);
+void timer_delay(void);
+
+void int0_isr (void) __interrupt (0) __using (1) {
+	char character;
+	char temp[3] = {0};
+	int t;
+	int i = 0;
+
+	position = 0x00;
+	returnHome();
+
+	while(1) {
+		character = getChar();
+		if (SW0 == 1 && SW1 == 1) 
+				break;
+
+		if (character == '*') {
+			position--;
+			if (position == 0x02 || position == 0x05) {
+				position--;
+			} else if (position < 0x00) {
+				position = 0x07;
+			}
+			setDdRamAddress(position);
+		} else if (character == '#') {
+			position++;
+			if (position == 0x02 || position == 0x05) {
+				position++;
+			} else if (position > 0x07) {
+				position = 0x00;
+			}
+			setDdRamAddress(position);
+		} else {
+			if ((position == 0x00 && character > '2') || ((position == 0x03 || position == 0x06) && character > '5')) { // hour can't enter 30s
+				; // invalid
+			} else {
+				temp[i++] = character;
+				sendChar(character);
+				position++;
+				if (i == 2) {
+					t = atoi(temp);
+					if (position == 0x02) {
+						if (t > 23) {
+							position--;
+							i--;
+						} else {
+							hour = t;
+							i = 0;
+							position++;
+						}
+					} else if (position == 0x05) {
+						if (t > 59) {
+							position--;
+							i--;
+						} else {
+							minute = t;
+							i = 0;
+							position++;
+						}
+					} else if (position == 0x08) {
+						if (t > 59) {
+							position--;
+							i--;
+						} else {
+							second = t;
+							i = 0;
+							position++;
+						}
+						position = 0x00;
+					}
+				}
+				setDdRamAddress(position);
+			}
+		}
+	}
+}
+
+void int1_isr (void) __interrupt (2) __using (1) {
+	char character;
+	char temp[3] = {0};
+	int t;
+	int i = 0; 
+
+	position = 0x40;
+	setDdRamAddress(position);
+
+	while(1) {
+		character = getChar();
+		if(SW0 == 1 && SW1 == 1) 
+				break;
+
+		if (character == '*') {
+			position--;
+			if (position == 0x42 || position == 0x45) {
+				position--;
+			} else if(position < 0x40) {
+				position = 0x47;
+			}
+			setDdRamAddress(position);
+		} else if (character == '#') {
+			position++;
+			if (position == 0x42 || position == 0x45) {
+				position++;
+			} else if (position > 0x47) {
+				position = 0x40;
+			}
+			setDdRamAddress(position);
+		} else {
+			if((position == 0x40 && character > '3') || (position == 0x43 && character > '2')) { // day can't enter 40s, month can't enter 20s
+				; // invalid
+			} else {
+				temp[i++] = character;
+				sendChar(character);
+				position++;
+				if (i == 2) {
+					t = atoi(temp);
+					if (position == 0x42) {
+						if ((t > 31) && (((month < 8) && (month % 2 == 0)) && ((month > 7) && (month % 2 == 1) && (month != 2)))) {	
+							position--;
+							i--;
+						} else if ((t > 29) && (month == 2) && (year % 4 == 0)) {
+							position--;
+							i--;
+						} else if ((t > 28) && (month == 2) && (year % 4 == 1)) {
+							position--;
+							i--;
+						} else if ((t > 30) && (month != 2) && (((month < 8) && (month % 2 == 0)) && ((month > 7) && (month % 2 == 1)))) {
+							position--;
+							i--;
+						} else {
+							day = t;
+							i = 0;
+							position++;
+						}
+					} else if (position == 0x45) {
+						if (t > 12 && t < 1) {
+							position--;
+							i--;
+						} else {
+							month = t;
+							i = 0;
+							position++;
+						}
+					} else if (position == 0x48) {
+						year = t;
+						i = 0;
+						position == 0x40;
+					}
+				}
+				setDdRamAddress(position);
+			}
+		}
+	}
+}
+
+void main(void) __naked {
+	int delayCall;
+	month = 1;
+	day = 1;
+
+	// Setup for Interrupt
+	IT0 = 1; // make INT0 to edge triggered
+	IT1 = 1; // make INT1 to edge triggered
+	IE = 0x85; // enable external interrupt0 and interrupt1
+
+	functionSet();
+	entryModeSet(); // increment and no shift
+	displayOnOffControl(1, 1, 1); // display on, cursor on and blinking on
+	sendString("00:00:00");
+	setDdRamAddress(0x40);	// set address to start of second line
+	sendString("01-01-00");
+
+	// update time and date
+	while(1) {
+		// update the time
+		for(hour; hour < 24; ) {
+			for(minute; minute < 60; ) {
+				for(second; second < 60; ) {
+					// Wait 100ms
+					for(delayCall = 0; delayCall < 2; delayCall++) {
+						timer_delay();
+					}
+					second++;
+					// update LCD with current time (seconds)
+					returnHome();
+					displayToScreen(hour, minute, second, 0);
+				}
+				second = 0;
+				minute++;
+				// update LCD with current time (minutes)
+				returnHome();
+				displayToScreen(hour, minute, second, 0);
+			}
+			minute = 0;
+			hour++;
+			// update LCD with current time (hours)
+			returnHome();
+			if (hour == 24) {
+				hour = 0;
+				break;
+			}
+			displayToScreen(hour, minute, second, 0);
+		}
+		displayToScreen(hour, minute, second, 0);
+		
+		// update the date
+		// update the day
+		day++;
+		// update the month
+		if ((month < 8 && month % 2 == 1) || (month > 7 && month % 2 == 0)) {	// checks for months with 31 days
+			if (day > 31) {
+				day = 1;
+				month++;
+			}
+		} else if (month == 2) {	
+			if (year % 4 == 0) {	// checks for leap year
+				if(day > 29) {
+					day = 1;
+					month++;
+				}
+			} else {
+				if (day > 28) {
+					day = 1;
+					month++;
+				}
+			}
+		} else {	// the rest of months have 30 days
+			if (day > 30) {
+				day = 1;
+				month++;
+			}
+		}
+		// update the year
+		if (month > 12) {
+			month = 1;
+			year++;
+		}
+
+		if (year > 99) {
+			year = 0;
+		}
+		setDdRamAddress(0x40);
+		displayToScreen(day, month, year, 1);
+	}
+}
+
+// --------------------------------------------------------------------
+
+char getChar(void) {
+	unsigned char row;   // Contains the required mask to clear one of the rows at a time
+	unsigned char col;   // Contains the output of the columns
+	unsigned char keypad[4][3] = {   // This array contains the ASCII of the keypad keys
+		{'3','2','1'},
+		{'6','5','4'},
+		{'9','8','7'},
+		{'#','0','*'}
+	};
+	
+	unsigned char i;
+	unsigned char gotkey = 0;
+
+	while (1) {
+		row = 0xf7;  // The first row (connected to P0.3) will be zero
+		
+		for (i=0; i<4; ++i){ // loop over the 4 rows
+			
+			P0 = 0xff;     // Initialize the 4 rows to '1' and set the column ports to inputs
+			P0 = P0 & row; // clear one row at a time
+			col = P0 & 0x70;  // Read the 3 columns
+			if (col != 0x70){ // If any column is zero i.e. a key is pressed
+				col = (~col) & 0x70;  // because the selected column returns zero
+				col = col >> 5;       // The column variable now contain the number of the selected column
+				gotkey = keypad[i][col]; // Get the ASCII of the corresponding pressed key
+				big_delay();
+				big_delay();
+				break;  // Since a key was detected -> Exit the for loop
+			}
+			row = row >> 1;   // No key is detected yet, try the next row
+			row = row | 0xf0; // Only one of the least 4 significant bits is '0' at a time 
+			
+		}
+		
+		if (gotkey != 0)
+			break;
+		if (SW1 == 1 && SW0 == 1)
+			break;
+	}
+
+	return gotkey;
+}
+
+void displayToScreen(int h, int m, int s, int f) {
+	sendChar(h / 10 + 48);
+	sendChar(h % 10 + 48);
+	if (f == 1) {
+		sendChar('-');
+	} else {
+		sendChar(':');
+	}
+	sendChar(m / 10 + 48);
+	sendChar(m % 10 + 48);
+	if (f == 1) {
+		sendChar('-');
+	} else {
+		sendChar(':');
+	}
+	sendChar(s / 10 + 48);
+	sendChar(s % 10 + 48);
+}
+
+// LCD Module instructions -------------------------------------------
+
+void returnHome(void) {
+	RS = 0;
+	P1 = 0x02; // LCD command to return home (the first location of the first lcd line)
+	E = 1;
+	E = 0;
+	big_delay(); // This operation needs a bigger delay
+}	
+
+void entryModeSet() {
+	RS = 0;
+	P1 = 0x06;  
+	E = 1;
+	E = 0;
+	delay();
+}
+
+void displayOnOffControl(__bit display, __bit cursor, __bit blinking) {
+	P1_7 = 0;
+	P1_6 = 0;
+	P1_5 = 0;
+	P1_4 = 0;
+	P1_3 = 1;
+	P1_2 = display;
+	P1_1 = cursor;
+	P1_0 = blinking;
+	E = 1;
+	E = 0;
+	delay();
+}
+
+void cursorOrDisplayShift(__bit sc, __bit rl) {
+	RS = 0;
+	P1_7 = 0;
+	P1_6 = 0;
+	P1_5 = 0;
+	P1_4 = 1;
+	P1_3 = sc;
+	P1_2 = rl;
+	P1_1 = 0;
+	P1_0 = 0;
+	E = 1;
+	E = 0;
+	delay();
+}
+
+void functionSet(void) {
+	RS = 0;
+	P1 = 0x38; // 8-bit mode, 2 lines LCD
+	E = 1;
+	E = 0;
+	delay();
+}
+
+void clearDisplay(void) {
+	RS = 0;
+	P1 = 0x01; // command to clear LCD and return the cursor to the home position
+	E = 1;
+	E = 0;
+	big_delay(); // This operation needs a bigger delay
+}	
+
+void setDdRamAddress(char address) {  // Determine the place to place the next character - First LCD location address in 00h for line 1 and 40h for line 2
+	RS = 0;
+	P1 = address | 0x80;  // set the MSB to detect that this is an address
+	E = 1;
+	E = 0;
+	delay();
+}
+
+// --------------------------------------------------------------------
+
+void sendChar(char c) {  // Function to send one character to be displayed on the LCD
+	RS = 1;
+	P1 = c;
+	E = 1;
+	E = 0;
+	delay();
+}
+
+void sendString(char* str) {  // Function to send a string of characters to be displayed on the lCD
+	char c;
+	while (c = *str++) {
+		sendChar(c);
+	}
+}
+
+void delay(void) {
+	char c;
+	for (c = 0; c < 50; c++);
+}
+
+void big_delay(void) {
+	unsigned char c;
+	for (c = 0; c < 255; c++);
+}
+
+void timer_delay(void) {	
+	TMOD = 0x01;
+	TL0 = 0xAF;
+	TH0 = 0x3C;
+	TR0 = 1;
+	while (!TF0) ;
+	TR0 = 0;
+	TF0 = 0;
+}
+
+// To make the interrupt work correctly with Edsim51
+void _sdcc_gsinit_startup(void) {
+
+        __asm
+                mov sp, #0x5F
+        __endasm;
+        main();
+}
